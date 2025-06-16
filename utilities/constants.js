@@ -14,7 +14,7 @@ let constants = {
         schoolsuperAdmin: 'schoolsuperAdmin',
         schoolbranch: 'schoolbranch',
     },
-    supermodel: {
+        supermodel: {
         auth: 'auth',
         role: 'role',
         academicyear: 'academicyear',

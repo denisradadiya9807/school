@@ -25,7 +25,7 @@ const student = new mongoose.Schema({
         type: String,
         require: true
     },
-        Student_Name: {
+    Student_Name: {
         type: String,
         require: true
     },
@@ -66,7 +66,7 @@ const student = new mongoose.Schema({
         require: true
     },
     Father_Email: {
-        type: String,   
+        type: String,
         require: true
     },
     Father_Occupation: {

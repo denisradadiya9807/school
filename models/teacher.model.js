@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var mongoosePaginate = require('mongoose-paginate-v2');
 const teacher = new mongoose.Schema({
-    Teachername: {
+        Teachername: {
         type: String,
         require: true
     },
