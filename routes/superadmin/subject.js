@@ -1,0 +1,15 @@
+let express = require('express');
+let router = express.Router();
+const upload = require('../../utilities/multer');
+let helper = require('../../utilities/helper');
+let savectrl = require('../../controllers/superadmin/subject/save');
+let deletectrl = require('../../controllers/superadmin/subject/delete');
+let paginatectrl = require('../../controllers/superadmin/subject/list');
+let listctrl = require('../../controllers/superadmin/subject/list');
+let statusctrl = require('../../controllers/superadmin/subject/status');
+router.post('/status', helper.authenticateToken, statusctrl.status);
+router.post('/list', helper.authenticateToken, listctrl.list);
+router.post('/withpaginate', helper.authenticateToken, paginatectrl.withpagination);
+router.post('/delete', helper.authenticateToken, deletectrl.delete);
+router.post('/save', helper.authenticateToken, upload.single('profile'), savectrl.save);
+module.exports = router;    

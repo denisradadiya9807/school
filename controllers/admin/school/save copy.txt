@@ -1,0 +1,135 @@
+exports.saveschool = async (req, res) => {
+res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+res.setHeader('Access-Control-Allow-Origin', '*');
+if (req.token && mongoose.Types.ObjectId.isValid(req.token.superadminId)) {
+const { leadsid } = req.body;
+let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+let superadminData = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminId).lean();
+if (superadminData && superadminData != null && superadminData.status === true) {
+let havepermission = await config.getPermission(superadminData.roleId, 'schools', 'insertUpdate', primary);
+if (havepermission) {
+if (leadsid && leadsid.trim() != '' && leadsid != null && leadsid != undefined && mongoose.Types.ObjectId.isValid(leadsid)) {
+let leadsData = await primary.model(constants.MODELS.leads, leadsModel).findById(leadsid).lean();
+if (leadsData && leadsData != null && leadsData.converttoschool === false) {
+let enPassword = await helper.passwordEncryptor(leadsData.school_college_code);
+let currentyear = new Date().getFullYear();
+let nextyear = parseInt(currentyear + 1);
+let secondaryDatabase = 'db_' + leadsData.school_college_name.toLowerCase().replace(/[^a-zA-Z0-9]/g, "") + '_' + currentyear + '_' + nextyear;
+let secondary = mongoConnection.useDb(secondaryDatabase);
+let databasearray = [];
+databasearray.push(secondaryDatabase);
+let schoolobj = {
+school_college_code: leadsData.school_college_code,
+school_college_name: leadsData.school_college_name,
+school_college_logo: leadsData.school_college_logo,
+school_college_address: leadsData.school_college_address,
+country_code: leadsData.country_code,
+phoneno: leadsData.phoneno,
+whatsappno: leadsData.whatsappno,
+country_wise_contact: (leadsData.country_wise_contact) ? leadsData.country_wise_contact : {},
+official_email: leadsData.official_email,
+website: leadsData.website,
+database: databasearray,
+status: true,
+isabletocreatebranch: false,
+leadsid: new mongoose.Types.ObjectId(leadsid),
+createdAtTimestamp: Date.now(),
+updatedAtTimestamp: Date.now(),
+createdBy: new mongoose.Types.ObjectId(req.token.superadminId),
+updatedBy: new mongoose.Types.ObjectId(req.token.superadminId)
+};
+let newSchool = await primary.model(constants.MODELS.schools, schoolModel).create(schoolobj);
+let adminobj = {
+photo: leadsData.person_profile,
+name: leadsData.contact_person_details.contact_person_name,
+email: leadsData.contact_person_details.contact_person_email,
+password: enPassword,
+status: true,
+country_code: leadsData.contact_person_details.contact_person_country_code,
+mobile: leadsData.contact_person_details.contact_person_mobile,
+country_wise_contact: (leadsData.contact_person_details.contact_person_country_wise_contact) ? leadsData.contact_person_details.contact_person_country_wise_contact : {},
+whatsappno: leadsData.contact_person_details.contact_person_whatsappno,
+gender: leadsData.contact_person_details.contact_person_gender,
+accessallbranch: true,
+accessbranches: [],
+createdAtTimestamp: Date.now(),
+updatedAtTimestamp: Date.now(),
+createdBy_sadmin: new mongoose.Types.ObjectId(req.token.superadminId)
+};
+let newadmin = await secondary.model(constants.MODELS.admins, adminModel).create(adminobj);
+let settingobj = {
+admintheme: '#3B418B',
+student_app_color: '#3B418B',
+teacher_app_color: '#3B418B',
+visitor_app_color: '#3B418B',
+createdBy: new mongoose.Types.ObjectId(newadmin._id),
+updatedBy: new mongoose.Types.ObjectId(newadmin._id)
+};
+await secondary.model(constants.MODELS.settings, settingModel).create(settingobj);
+let branchobj = {
+branchname: leadsData.school_college_name,
+branchcode: leadsData.school_college_code,
+email: leadsData.official_email,
+country_code: leadsData.country_code,
+phone: leadsData.phoneno,
+country_wise_contact: (leadsData.country_wise_contact) ? leadsData.country_wise_contact : {},
+schoolid: new mongoose.Types.ObjectId(newSchool._id),
+address: leadsData.school_college_address,
+createdAtTimestamp: Date.now(),
+updatedAtTimestamp: Date.now(),
+createdBy: new mongoose.Types.ObjectId(newadmin._id),
+updatedBy: new mongoose.Types.ObjectId(newadmin._id)
+};
+let branchData = await secondary.model(constants.MODELS.schoolbranches, schoolbranchesModel).create(branchobj);
+let accessbranchesarray = [];
+accessbranchesarray.push(branchData._id.toString());
+await secondary.model(constants.MODELS.admins, adminModel).findByIdAndUpdate(newadmin._id, {accessbranches : accessbranchesarray});
+let permissionarray = [];
+async.forEachSeries(config.adminCollections, (collection, next_collection) => {
+let obj = {
+displayname: collection.text,
+collectionName: collection.value,
+insertUpdate: true,
+delete: true,
+view: true
+};
+permissionarray.push(obj);
+next_collection();
+}, async () => {
+let settingobj = {
+displayname: 'Settings',
+collectionName: 'settings',
+insertUpdate: true,
+delete: true,
+view: true
+};
+permissionarray.push(settingobj);
+let permissionobj = {
+name: "School College Admin",
+permissions: permissionarray,
+createdAtTimestamp: Date.now(),
+updatedAtTimestamp: Date.now(),
+createdBy: new mongoose.Types.ObjectId(newadmin._id),
+updatedBy: new mongoose.Types.ObjectId(newadmin._id)
+}
+let newrole = await secondary.model(constants.MODELS.roles, roleModel).create(permissionobj);
+await secondary.model(constants.MODELS.admins, adminModel).findByIdAndUpdate(newadmin._id, { roleId: new mongoose.Types.ObjectId(newrole._id), channelID: newadmin._id.toString().toUpperCase() + '_' + newadmin.mobile.toString() });
+await primary.model(constants.MODELS.leads, leadsModel).findByIdAndUpdate(leadsid, { converttoschool: true });
+return responseManager.onSuccess('Leads convert to school or college successfully...', newSchool, res);
+});
+} else {
+return responseManager.badrequest({ message: 'Leads already convert to school or college...!' }, res);
+}
+} else {
+return responseManager.badrequest({ message: 'Invalid leadsid to convert to school or college...!' }, res);
+}
+} else {
+return responseManager.accessDenied(res);
+}
+} else {
+return responseManager.unauthorisedRequest(res);
+}
+} else {
+return responseManager.unauthorisedRequest(res);
+}
+};
