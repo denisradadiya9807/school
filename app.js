@@ -114,7 +114,13 @@ const superadmin = [
   { path: '/stream', routesFile: 'stream' },
   { path: '/timetable', routesFile: 'timetable' },
   { path: '/attendancestudent', routesFile: 'attendancestudent' },
-  { path: '/attendenceteacher', routesFile: 'attendenceteacher' }
+  { path: '/attendenceteacher', routesFile: 'attendenceteacher' },
+  { path: '/holiday', routesFile: 'holiday' },
+  { path: '/examtype', routesFile: 'examtype' },
+  { path: '/exam', routesFile: 'exam' },
+  { path: '/feestype', routesFile: 'feestype' },
+  { path: '/fees', routesFile: 'fees' },
+  { path: '/notice', routesFile: 'notice' },
 ]
 
 adminPaths.forEach((adminPaths) => {

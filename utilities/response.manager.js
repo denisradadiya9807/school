@@ -7,7 +7,7 @@ exports.onSuccess = (message, result, res) => {
     });
 };
 exports.onBadRequest = (error, res) => {
-    res.status(400).json({
+        res.status(400).json({
         Message: error.message,
         Data: 0,
         Status: 400,

@@ -11,7 +11,7 @@ var config = require('../../../utilities/config');
 var mongoose = require('mongoose');
 exports.save = async (req, res) => {
     const { classname, sectionid, classid, status, branchid } = req.body
-    if (req.token && mongoose.Types.ObjectId.isValid(req.token.adminId)) {
+    if (req.token && mongoose.Types.ObjectId.isValid(req.token.adminId)) {  
         let primary1 = mongoconnection.useDb(req.token.database);
         let primary = mongoconnection.useDb(constants.schoolsuperadmin);
         let classs = await primary1.model(constants.Model.admin, adminmodel).findById(req.token.adminId).lean();

@@ -15,7 +15,7 @@ var responsemanager = require('../../../utilities/response.manager');
 exports.save = async (req, res) => {
     const { Adminssion_NO, Date_Of_Admission, Roll_No, classname, section, academicyear, Student_Name, Student_Mobile_No, Student_Email, Student_Gender, Student_Date_Of_Birth,
         Student_Blood_Group, Student_Height, Student_Weight, Father_Name, Father_Mobile_No, Father_Email, Father_Occupation, Father_Qualification, Father_Address, Mother_Name,
-        Mother_Mobile_No, Mother_Email, Mother_Occupation, Mother_Qualification, Mother_Address, Nationality, Religion, cast, Bank_Branch, Account_No, IFSC_Code, Address, City, studentid,
+        Mother_Mobile_No, Mother_Email, Mother_Occupation, Mother_Qualification, Mother_Address, Nationality, Religion, cast, Bank_Branch, Account_No, IFSC_Code, Address, City, studentid, yearly_fee, yearly_transportation, reminderday, payment_structureid, fee_dates, feereminderday, feeremindertimestamp, academic_startmonth,
         State, Country, branchid } = req.body;
     if (req.token && mongoose.Types.ObjectId.isValid(req.token.adminId)) {
         let primary1 = mongoconnection.useDb(req.token.database);
@@ -61,193 +61,225 @@ exports.save = async (req, res) => {
                                                                                                                                                         if (City && City != '' && City != null && City != undefined) {
                                                                                                                                                             if (State && State != '' && State != null && State != undefined) {
                                                                                                                                                                 if (Country && Country != '' && Country != null && Country != undefined) {
-                                                                                                                                                                    let duplicateQuery = { Adminssion_NO: Adminssion_NO };
-                                                                                                                                                                    if (studentid) {
-                                                                                                                                                                        duplicateQuery._id = { $ne: new mongoose.Types.ObjectId(studentid) };
-                                                                                                                                                                    }
-                                                                                                                                                                    let exiting = await primary.model(constants.supermodel.student, studentmodel)
-                                                                                                                                                                        .findOne(duplicateQuery)
-                                                                                                                                                                        .lean();
-
-                                                                                                                                                                    if (exiting) {
-                                                                                                                                                                        return responsemanager.onBadRequest({ message: 'Student Data Already Exists...' }, res);
-                                                                                                                                                                    }
-                                                                                                                                                                    let classs = await primary.model(constants.supermodel.class, classmodel).findOne({ classname: classname }).lean();
-                                                                                                                                                                    if (!classs) {
-                                                                                                                                                                        return responsemanager.onBadRequest({ message: 'Class Name Not Found' }, res);
-                                                                                                                                                                    }
-                                                                                                                                                                    let sections = await primary.model(constants.supermodel.section, sectionmodel).findOne({ section: section }).lean();
-                                                                                                                                                                    if (!sections) {
-                                                                                                                                                                        return responsemanager.onBadRequest({ message: 'section Is Not Found' }, res);
-                                                                                                                                                                    }
-                                                                                                                                                                    let acedemicyear = await primary.model(constants.supermodel.academicyear, academicyearmodel).findOne({ academicyear: academicyear }).lean();
-                                                                                                                                                                    if (!acedemicyear) {
-                                                                                                                                                                        return responsemanager.onBadRequest({ message: 'Academic year not found' }, res);
-                                                                                                                                                                    }
-
-                                                                                                                                                                    let schoolBranch = await primary1.model(constants.Model.schoolbranch, branchmodel).findOne({ _id: new mongoose.Types.ObjectId(branchid) }).lean();
-                                                                                                                                                                    if (!schoolBranch) {
-                                                                                                                                                                        return responsemanager.onBadRequest({ message: 'branch is not found   ' }, res);
-                                                                                                                                                                    }
-                                                                                                                                                                    let obj = {
-                                                                                                                                                                        Adminssion_NO: Adminssion_NO,
-                                                                                                                                                                        Date_Of_Admission: Date_Of_Admission,
-                                                                                                                                                                        Roll_No: Roll_No,
-                                                                                                                                                                        classname: classname,
-                                                                                                                                                                        section: section,
-                                                                                                                                                                        academicyear: academicyear,
-                                                                                                                                                                        Student_Name: Student_Name,
-                                                                                                                                                                        Student_Mobile_No: Student_Mobile_No,
-                                                                                                                                                                        Student_Email: Student_Email,
-                                                                                                                                                                        Student_Gender: Student_Gender,
-                                                                                                                                                                        Student_Date_Of_Birth: Student_Date_Of_Birth,
-                                                                                                                                                                        Student_Blood_Group: Student_Blood_Group,
-                                                                                                                                                                        Student_Height: Student_Height,
-                                                                                                                                                                        Student_Weight: Student_Weight,
-                                                                                                                                                                        Father_Name: Father_Name,
-                                                                                                                                                                        Father_Mobile_No: Father_Mobile_No,
-                                                                                                                                                                        Father_Email: Father_Email,
-                                                                                                                                                                        Father_Occupation: Father_Qualification,
-                                                                                                                                                                        Father_Qualification: Father_Qualification,
-                                                                                                                                                                        Father_Address: Father_Address,
-                                                                                                                                                                        Mother_Name: Mother_Name,
-                                                                                                                                                                        Mother_Mobile_No: Mother_Mobile_No,
-                                                                                                                                                                        Mother_Email: Mother_Email,
-                                                                                                                                                                        Mother_Occupation: Mother_Occupation,
-                                                                                                                                                                        Mother_Qualification: Mother_Qualification,
-                                                                                                                                                                        Mother_Address: Mother_Address,
-                                                                                                                                                                        Nationality: Nationality,
-                                                                                                                                                                        Religion: Religion,
-                                                                                                                                                                        cast: cast,
-                                                                                                                                                                        Bank_Branch: Bank_Branch,
-                                                                                                                                                                        Account_No: Account_No,
-                                                                                                                                                                        IFSC_Code: IFSC_Code,
-                                                                                                                                                                        Address: Address,
-                                                                                                                                                                        City: City,
-                                                                                                                                                                        State: State,
-                                                                                                                                                                        Country: Country,
-                                                                                                                                                                        branchid: branchid,
-                                                                                                                                                                        status: true
-                                                                                                                                                                    }
-                                                                                                                                                                    if (studentid) {
-                                                                                                                                                                        let studentupdate = await primary.model(constants.supermodel.student, studentmodel).findOneAndUpdate(
-                                                                                                                                                                            { _id: new mongoose.Types.ObjectId(studentid) },
-                                                                                                                                                                        );
-                                                                                                                                                                        return responsemanager.onSuccess('Student Data updated successfully...', studentupdate, res);
+                                                                                                                                                                    if (fee_dates && fee_dates != '' && fee_dates != null && fee_dates != undefined) {
+                                                                                                                                                                        // fee_dates = JSON.parse(fee_dates);
+                                                                                                                                                                        if (fee_dates && Array.isArray(fee_dates) && fee_dates.length > 0) {
+                                                                                                                                                                            if (academic_startmonth && !(isNaN(academic_startmonth)) && academic_startmonth > 0) {
+                                                                                                                                                                                // if (is_detain === 'true' || is_detain === 'false') {
+                                                                                                                                                                                let millisecondsPerDay = 24 * 60 * 60 * 1000;
+                                                                                                                                                                                let reminderday = 0;
+                                                                                                                                                                                let reminderdaytimestamp = 0;
+                                                                                                                                                                                if (feereminderday && feereminderday != null && feereminderday != undefined && !isNaN(feereminderday) && parseFloat(feereminderday) > 0) {
+                                                                                                                                                                                    let currenttimestamp = Date.now();
+                                                                                                                                                                                    reminderday = feereminderday;
+                                                                                                                                                                                    reminderdaytimestamp = currenttimestamp + (feereminderday * millisecondsPerDay);
+                                                                                                                                                                                }
+                                                                                                                                                                                const studentData = studentid ? await primary.model(constants.supermodel.student, studentmodel)
+                                                                                                                                                                                    .findById(studentid).lean() : null;
+                                                                                                                                                                                let checkfeepaid = [];
+                                                                                                                                                                                if (studentData?.fee_dates && Array.isArray(studentData.fee_dates)) {
+                                                                                                                                                                                    checkfeepaid = studentData.fee_dates.filter(obj => obj.status === 'paid');
+                                                                                                                                                                                }
+                                                                                                                                                                                let duplicateQuery = { Adminssion_NO: Adminssion_NO };
+                                                                                                                                                                                if (studentid) {
+                                                                                                                                                                                    duplicateQuery._id = { $ne: new mongoose.Types.ObjectId(studentid) };
+                                                                                                                                                                                }
+                                                                                                                                                                                let exiting = await primary.model(constants.supermodel.student, studentmodel).findOne(duplicateQuery).lean();
+                                                                                                                                                                                if (exiting) {
+                                                                                                                                                                                    return responsemanager.onBadRequest({ message: 'Student Data Already Exists...' }, res);
+                                                                                                                                                                                }
+                                                                                                                                                                                let classs = await primary.model(constants.supermodel.class, classmodel).findOne({ classname: classname }).lean();
+                                                                                                                                                                                if (!classs) {
+                                                                                                                                                                                    return responsemanager.onBadRequest({ message: 'Class Name Not Found' }, res);
+                                                                                                                                                                                }
+                                                                                                                                                                                let sections = await primary.model(constants.supermodel.section, sectionmodel).findOne({ section: section }).lean();
+                                                                                                                                                                                if (!sections) {
+                                                                                                                                                                                    return responsemanager.onBadRequest({ message: 'section Is Not Found' }, res);
+                                                                                                                                                                                }
+                                                                                                                                                                                let acedemicyear = await primary.model(constants.supermodel.academicyear, academicyearmodel).findOne({ academicyear: academicyear }).lean();
+                                                                                                                                                                                if (!acedemicyear) {
+                                                                                                                                                                                    return responsemanager.onBadRequest({ message: 'Academic year not found' }, res);
+                                                                                                                                                                                }
+                                                                                                                                                                                let schoolBranch = await primary1.model(constants.Model.schoolbranch, branchmodel).findOne({ _id: new mongoose.Types.ObjectId(branchid) }).lean();
+                                                                                                                                                                                if (!schoolBranch) {
+                                                                                                                                                                                    return responsemanager.onBadRequest({ message: 'branch is not found   ' }, res);
+                                                                                                                                                                                }
+                                                                                                                                                                                let obj = {
+                                                                                                                                                                                    Adminssion_NO: Adminssion_NO,
+                                                                                                                                                                                    Date_Of_Admission: Date_Of_Admission,
+                                                                                                                                                                                    Roll_No: Roll_No,
+                                                                                                                                                                                    classname: classname,
+                                                                                                                                                                                    section: section,
+                                                                                                                                                                                    academicyear: academicyear,
+                                                                                                                                                                                    Student_Name: Student_Name,
+                                                                                                                                                                                    Student_Mobile_No: Student_Mobile_No,
+                                                                                                                                                                                    Student_Email: Student_Email,
+                                                                                                                                                                                    Student_Gender: Student_Gender,
+                                                                                                                                                                                    Student_Date_Of_Birth: Student_Date_Of_Birth,
+                                                                                                                                                                                    Student_Blood_Group: Student_Blood_Group,
+                                                                                                                                                                                    Student_Height: Student_Height,
+                                                                                                                                                                                    Student_Weight: Student_Weight,
+                                                                                                                                                                                    Father_Name: Father_Name,
+                                                                                                                                                                                    Father_Mobile_No: Father_Mobile_No,
+                                                                                                                                                                                    Father_Email: Father_Email,
+                                                                                                                                                                                    Father_Occupation: Father_Qualification,
+                                                                                                                                                                                    Father_Qualification: Father_Qualification,
+                                                                                                                                                                                    Father_Address: Father_Address,
+                                                                                                                                                                                    Mother_Name: Mother_Name,
+                                                                                                                                                                                    Mother_Mobile_No: Mother_Mobile_No,
+                                                                                                                                                                                    Mother_Email: Mother_Email,
+                                                                                                                                                                                    Mother_Occupation: Mother_Occupation,
+                                                                                                                                                                                    Mother_Qualification: Mother_Qualification,
+                                                                                                                                                                                    Mother_Address: Mother_Address,
+                                                                                                                                                                                    Nationality: Nationality,
+                                                                                                                                                                                    Religion: Religion,
+                                                                                                                                                                                    cast: cast,
+                                                                                                                                                                                    Bank_Branch: Bank_Branch,
+                                                                                                                                                                                    Account_No: Account_No,
+                                                                                                                                                                                    IFSC_Code: IFSC_Code,
+                                                                                                                                                                                    Address: Address,
+                                                                                                                                                                                    City: City,
+                                                                                                                                                                                    State: State,
+                                                                                                                                                                                    Country: Country,
+                                                                                                                                                                                    branchid: branchid,
+                                                                                                                                                                                    status: true,
+                                                                                                                                                                                    yearly_fee: (checkfeepaid && Array.isArray(checkfeepaid) && checkfeepaid.length > 0) ? studentData.yearly_fee : yearly_fee,
+                                                                                                                                                                                    yearly_transportation: (checkfeepaid && Array.isArray(checkfeepaid) && checkfeepaid.length > 0) ? studentData.yearly_transportation : (yearly_transportation && !(isNaN(yearly_transportation)) && yearly_transportation > 0) ? yearly_transportation : 0,
+                                                                                                                                                                                    payment_structureid: (checkfeepaid && Array.isArray(checkfeepaid) && checkfeepaid.length > 0) ? new mongoose.Types.ObjectId(studentData.payment_structureid) : new mongoose.Types.ObjectId(payment_structureid),
+                                                                                                                                                                                    // fee_dates: (checkfeepaid && Array.isArray(checkfeepaid) && checkfeepaid.length > 0) ? studentData.fee_dates : fee_dates,
+                                                                                                                                                                                    fee_dates,
+                                                                                                                                                                                    feereminderday: reminderday,
+                                                                                                                                                                                    feeremindertimestamp: reminderdaytimestamp,
+                                                                                                                                                                                    academic_startmonth: (checkfeepaid && Array.isArray(checkfeepaid) && checkfeepaid.length > 0) ? studentData.academic_startmonth : academic_startmonth,
+                                                                                                                                                                                }
+                                                                                                                                                                                if (studentid) {
+                                                                                                                                                                                    let studentupdate = await primary.model(constants.supermodel.student, studentmodel).findOneAndUpdate(
+                                                                                                                                                                                        { _id: new mongoose.Types.ObjectId(studentid) },
+                                                                                                                                                                                    );
+                                                                                                                                                                                    return responsemanager.onSuccess('Student Data updated successfully...', studentupdate, res);
+                                                                                                                                                                                } else {
+                                                                                                                                                                                    let studentcreate = await primary.model(constants.supermodel.student, studentmodel).create(obj);
+                                                                                                                                                                                    return responsemanager.onSuccess('Student Data Created Successfully...', studentcreate, res);
+                                                                                                                                                                                }
+                                                                                                                                                                            } else {
+                                                                                                                                                                                return responsemanager.onBadRequest({ message: 'academic_startmonth Is Not valid...' }, res)
+                                                                                                                                                                            }
+                                                                                                                                                                        } else {
+                                                                                                                                                                            return responsemanager.onBadRequest({ message: 'fee_dates Is Not valid...' }, res)
+                                                                                                                                                                        }
                                                                                                                                                                     } else {
-                                                                                                                                                                        let studentcreate = await primary.model(constants.supermodel.student, studentmodel).create(obj);
-                                                                                                                                                                        return responsemanager.onSuccess('Student Data Created Successfully...', studentcreate, res);
+                                                                                                                                                                        return responsemanager.onBadRequest({ message: 'fee_dates Is Not valid...' }, res)
                                                                                                                                                                     }
                                                                                                                                                                 } else {
-                                                                                                                                                                    return responsemanager.onBadRequest({ message: 'Country Is Not valid...' })
+                                                                                                                                                                    return responsemanager.onBadRequest({ message: 'Country Is Not valid...' }, res)
                                                                                                                                                                 }
                                                                                                                                                             } else {
-                                                                                                                                                                return responsemanager.onBadRequest({ message: 'State Is Not valid...' })
+                                                                                                                                                                return responsemanager.onBadRequest({ message: 'State Is Not valid...' }, res)
                                                                                                                                                             }
                                                                                                                                                         } else {
-                                                                                                                                                            return responsemanager.onBadRequest({ message: 'City Is Not valid...' })
+                                                                                                                                                            return responsemanager.onBadRequest({ message: 'City Is Not valid...' }, res)
                                                                                                                                                         }
                                                                                                                                                     } else {
-                                                                                                                                                        return responsemanager.onBadRequest({ message: 'Address Is Not valid...' })
+                                                                                                                                                        return responsemanager.onBadRequest({ message: 'Address Is Not valid...' }, res)
                                                                                                                                                     }
                                                                                                                                                 } else {
-                                                                                                                                                    return responsemanager.onBadRequest({ message: 'IFSC_Code Is Not valid...' })
+                                                                                                                                                    return responsemanager.onBadRequest({ message: 'IFSC_Code Is Not valid...' }, res)
                                                                                                                                                 }
                                                                                                                                             } else {
-                                                                                                                                                return responsemanager.onBadRequest({ message: 'Account_No Is Not valid...' })
+                                                                                                                                                return responsemanager.onBadRequest({ message: 'Account_No Is Not valid...' }, res)
                                                                                                                                             }
                                                                                                                                         } else {
-                                                                                                                                            return responsemanager.onBadRequest({ message: 'Bank_Branch Is Not valid...' })
+                                                                                                                                            return responsemanager.onBadRequest({ message: 'Bank_Branch Is Not valid...' }, res)
                                                                                                                                         }
                                                                                                                                     } else {
-                                                                                                                                        return responsemanager.onBadRequest({ message: 'cast Is Not valid...' })
+                                                                                                                                        return responsemanager.onBadRequest({ message: 'cast Is Not valid...' }, res)
                                                                                                                                     }
                                                                                                                                 } else {
-                                                                                                                                    return responsemanager.onBadRequest({ message: 'Religion Is Not valid...' })
+                                                                                                                                    return responsemanager.onBadRequest({ message: 'Religion Is Not valid...' }, res)
                                                                                                                                 }
                                                                                                                             } else {
-                                                                                                                                return responsemanager.onBadRequest({ message: 'Nationality Is Not valid...' })
+                                                                                                                                return responsemanager.onBadRequest({ message: 'Nationality Is Not valid...' }, res)
                                                                                                                             }
                                                                                                                         } else {
-                                                                                                                            return responsemanager.onBadRequest({ message: 'Mother_Address Is Not valid...' })
+                                                                                                                            return responsemanager.onBadRequest({ message: 'Mother_Address Is Not valid...' }, res)
                                                                                                                         }
                                                                                                                     } else {
-                                                                                                                        return responsemanager.onBadRequest({ message: 'Mother_Qualification Is Not valid...' })
+                                                                                                                        return responsemanager.onBadRequest({ message: 'Mother_Qualification Is Not valid...' }, res)
                                                                                                                     }
                                                                                                                 } else {
-                                                                                                                    return responsemanager.onBadRequest({ message: 'Mother_Occupation Is Not valid...' })
+                                                                                                                    return responsemanager.onBadRequest({ message: 'Mother_Occupation Is Not valid...' }, res)
                                                                                                                 }
                                                                                                             } else {
-                                                                                                                return responsemanager.onBadRequest({ message: 'Mother_Email Is Not valid...' })
+                                                                                                                return responsemanager.onBadRequest({ message: 'Mother_Email Is Not valid...' }, res)
                                                                                                             }
                                                                                                         } else {
-                                                                                                            return responsemanager.onBadRequest({ message: 'Mother_Mobile_No Is Not valid...' })
+                                                                                                            return responsemanager.onBadRequest({ message: 'Mother_Mobile_No Is Not valid...' }, res)
                                                                                                         }
                                                                                                     } else {
-                                                                                                        return responsemanager.onBadRequest({ message: 'Mother_Name Is Not valid...' })
+                                                                                                        return responsemanager.onBadRequest({ message: 'Mother_Name Is Not valid...' }, res)
                                                                                                     }
                                                                                                 } else {
-                                                                                                    return responsemanager.onBadRequest({ message: 'Father_Address Is Not valid...' })
+                                                                                                    return responsemanager.onBadRequest({ message: 'Father_Address Is Not valid...' }, res)
                                                                                                 }
                                                                                             } else {
-                                                                                                return responsemanager.onBadRequest({ message: 'Father_Qualification Is Not valid...' })
+                                                                                                return responsemanager.onBadRequest({ message: 'Father_Qualification Is Not valid...' }, res)
                                                                                             }
                                                                                         } else {
-                                                                                            return responsemanager.onBadRequest({ message: 'Father_Occupation Is Not valid...' })
+                                                                                            return responsemanager.onBadRequest({ message: 'Father_Occupation Is Not valid...' }, res)
                                                                                         }
                                                                                     } else {
-                                                                                        return responsemanager.onBadRequest({ message: 'Father_Name Is Not valid...' })
+                                                                                        return responsemanager.onBadRequest({ message: 'Father_Name Is Not valid...' }, res)
                                                                                     }
                                                                                 } else {
-                                                                                    return responsemanager.onBadRequest({ message: 'Father_Mobile_No Is Not valid...' })
+                                                                                    return responsemanager.onBadRequest({ message: 'Father_Mobile_No Is Not valid...' }, res)
                                                                                 }
                                                                             } else {
-                                                                                return responsemanager.onBadRequest({ message: 'Father_Email Is Not valid...' })
+                                                                                return responsemanager.onBadRequest({ message: 'Father_Email Is Not valid...' }, res)
                                                                             }
                                                                         } else {
-                                                                            return responsemanager.onBadRequest({ message: 'Father_Address Is Not valid...' })
+                                                                            return responsemanager.onBadRequest({ message: 'Father_Address Is Not valid...' }, res)
                                                                         }
                                                                     } else {
-                                                                        return responsemanager.onBadRequest({ message: 'Student_Weight Is Not valid...' })
+                                                                        return responsemanager.onBadRequest({ message: 'Student_Weight Is Not valid...' }, res)
                                                                     }
                                                                 } else {
-                                                                    return responsemanager.onBadRequest({ message: 'Student_Name Is Not valid...' })
+                                                                    return responsemanager.onBadRequest({ message: 'Student_Name Is Not valid...' }, res)
                                                                 }
                                                             } else {
-                                                                return responsemanager.onBadRequest({ message: 'Student_Mobile_No Is Not valid...' })
+                                                                return responsemanager.onBadRequest({ message: 'Student_Mobile_No Is Not valid...' }, res)
                                                             }
                                                         } else {
-                                                            return responsemanager.onBadRequest({ message: 'Student_Height Is Not valid...' })
+                                                            return responsemanager.onBadRequest({ message: 'Student_Height Is Not valid...' }, res)
                                                         }
                                                     } else {
-                                                        return responsemanager.onBadRequest({ message: 'Student_Gender Is Not valid...' })
+                                                        return responsemanager.onBadRequest({ message: 'Student_Gender Is Not valid...' }, res)
                                                     }
                                                 } else {
-                                                    return responsemanager.onBadRequest({ message: 'Student_Email Is Not valid...' })
+                                                    return responsemanager.onBadRequest({ message: 'Student_Email Is Not valid...' }, res)
                                                 }
                                             } else {
-                                                return responsemanager.onBadRequest({ message: 'Student_Date_Of_Birth Is Not valid...' })
+                                                return responsemanager.onBadRequest({ message: 'Student_Date_Of_Birth Is Not valid...' }, res)
                                             }
                                         } else {
-                                            return responsemanager.onBadRequest({ message: 'Student_Blood_Group Is Not valid...' })
+                                            return responsemanager.onBadRequest({ message: 'Student_Blood_Group Is Not valid...' }, res)
                                         }
                                     } else {
-                                        return responsemanager.onBadRequest({ message: 'academicyear Is Not valid...' })
+                                        return responsemanager.onBadRequest({ message: 'academicyear Is Not valid...' }, res)
                                     }
                                 } else {
-                                    return responsemanager.onBadRequest({ message: 'section Is Not valid...' })
+                                    return responsemanager.onBadRequest({ message: 'section Is Not valid...' }, res)
                                 }
                             } else {
-                                return responsemanager.onBadRequest({ message: 'classname Is Not valid...' })
+                                return responsemanager.onBadRequest({ message: 'classname Is Not valid...' }, res)
                             }
                         } else {
-                            return responsemanager.onBadRequest({ message: 'Roll_No Is Not valid...' })
+                            return responsemanager.onBadRequest({ message: 'Roll_No Is Not valid...' }, res)
                         }
                     } else {
-                        return responsemanager.onBadRequest({ message: 'Date_Of_Admission Is Not valid...' })
+                        return responsemanager.onBadRequest({ message: 'Date_Of_Admission Is Not valid...' }, res)
                     }
                 } else {
-                    return responsemanager.onBadRequest({ message: 'Admission_No Is Not valid...' })
+                    return responsemanager.onBadRequest({ message: 'Admission_No Is Not valid...' }, res)
                 }
             } else {
                 return responsemanager.accessdenied(res);

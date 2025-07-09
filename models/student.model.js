@@ -159,7 +159,32 @@ const student = new mongoose.Schema({
     }, status: {
         type: Boolean,
         require: true
-    }
+    },
+    yearly_fee: {
+        type: Number,
+        require: true
+    },
+    yearly_transportation: {
+        type: Number,
+        default: 0
+    },
+    payment_structureid: {
+        type: mongoose.Types.ObjectId,
+        require: true
+    },
+    fee_dates: [],
+    academic_startmonth: {
+        type: Number,
+        require: true
+    },
+    feereminderday: {
+        type: Number,
+        require: true
+    },
+    feeremindertimestamp: {
+        type: Number,
+        require: true
+    },
 });
 student.plugin(paginate)
 module.exports = student;

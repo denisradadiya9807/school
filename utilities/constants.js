@@ -14,7 +14,7 @@ let constants = {
         schoolsuperAdmin: 'schoolsuperAdmin',
         schoolbranch: 'schoolbranch',
     },
-        supermodel: {
+    supermodel: {
         auth: 'auth',
         role: 'role',
         academicyear: 'academicyear',
@@ -32,6 +32,12 @@ let constants = {
         timetable: 'timetable',
         attendancestudent: 'attendancestudent',
         attendanceteacher: 'attendanceteacher',
+        holiday: 'holiday',
+        examtype: 'examtype',
+        exam: 'exam',
+        feestype: 'feestype',
+        fees: 'fees',
+        notice: 'notice',
     }
 
 };

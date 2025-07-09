@@ -32,6 +32,11 @@ let getsuperadmincollection = [
     { text: 'timetable', value: 'timetable' },
     { text: 'attendancestudent', value: 'attendancestudent' },
     { text: 'attendanceteacher', value: 'attendanceteacher' },
+    { text: 'holiday', value: 'holiday' },
+    { text: 'examtype', value: 'examtype' },
+    { text: 'exam', value: 'exam' },
+    { text: 'fees', value: 'fees' },
+    { text: 'notice', value: 'notice' },
 ]
 async function getadminPermission(roleid, modelName, permissionType) {
     let primary = mongoConnection.useDb(constants.school);
